@@ -4,10 +4,10 @@ import com.zipcodewilmington.streams.tools.ReflectionUtils;
 import com.zipcodewilmington.streams.tools.logging.LoggerHandler;
 import com.zipcodewilmington.streams.tools.logging.LoggerWarehouse;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,15 +36,31 @@ public final class PersonWarehouse implements Iterable<Person> {
      * @return list of names of Person objects
      */ // TODO
     public List<String> getNames() {
-        return null;
+
+
+        return people.stream()
+                .map(person -> person.getName())
+                .collect(Collectors.toList());
+
     }
+
+
+    public static <Person>Predicate<Person> distinctByName(Function<? super Person, ?> keyExtractor){
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return Person -> seen.add(keyExtractor.apply(Person));
+    }
+
+
 
 
     /**
      * @return list of uniquely named Person objects
      */ //TODO
     public Stream<Person> getUniquelyNamedPeople() {
-        return null;
+
+        return people.stream()
+                .filter(distinctByName(Person::getName));
+
     }
 
 
@@ -53,7 +69,12 @@ public final class PersonWarehouse implements Iterable<Person> {
      * @return a Stream of respective
      */ //TODO
     public Stream<Person> getUniquelyNamedPeopleStartingWith(Character character) {
-        return null;
+
+        return people.stream()
+                .filter(person-> person.getName().startsWith(character.toString()))
+                .filter(distinctByName(Person::getName));
+
+
     }
 
     /**
@@ -61,14 +82,19 @@ public final class PersonWarehouse implements Iterable<Person> {
      * @return a Stream of respective
      */ //TODO
     public Stream<Person> getFirstNUniquelyNamedPeople(int n) {
-        return null;
+
+        return people.stream()
+                .filter(distinctByName(Person::getName))
+                .limit(n);
     }
 
     /**
      * @return a mapping of Person Id to the respective Person name
      */ // TODO
     public Map<Long, String> getIdToNameMap() {
-        return null;
+
+        return people.stream()
+                .collect(Collectors.toMap(Person::getPersonalId, Person::getName));
     }
 
 

@@ -11,8 +11,10 @@ import java.util.stream.Stream;
  * Created by leon on 5/25/17.
  */
 public final class ListConverter extends PersonConversionAgent<List<Person>> {
+    private final List<Person> personList;
     public ListConverter(List<Person> people) {
         super(people);
+        this.personList = this.toList();
     }
 
     public ListConverter(int collectionSize) {
@@ -29,11 +31,11 @@ public final class ListConverter extends PersonConversionAgent<List<Person>> {
 
     //TODO
     public Stream<Person> toStream() {
-        return null;
+        return personList.stream();
     }
 
     //TODO
     public Person[] toArray() {
-        return null;
+        return personList.stream().toArray(Person[] :: new);
     }
 }
